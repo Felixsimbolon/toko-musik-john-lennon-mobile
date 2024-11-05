@@ -207,8 +207,7 @@ class ItemCard extends StatelessWidget {
 2. Sebutkan widget apa saja yang kamu gunakan pada proyek ini dan jelaskan fungsinya.
 
 
-
-    1. Material App Berfungsi sebagai root aplikasi Flutter dan mengatur tema, nama aplikasi, serta konfigurasi awal. Ini mengatur navigasi dan tampilan keseluruhan aplikasi.
+    1. MaterialApp Berfungsi sebagai root aplikasi Flutter dan mengatur tema, nama aplikasi, serta konfigurasi awal. Ini mengatur navigasi dan tampilan keseluruhan aplikasi.
     2. Scaffold Menyediakan struktur dasar layar, seperti AppBar, Body, dan Bottom Navigation. Di sini digunakan untuk membangun tampilan utama aplikasi.
     3. Text Menampilkan teks statis atau dinamis sesuai dengan data yang diberikan.
     4. Padding Menambahkan ruang di sekitar widget agar tampilan lebih rapi.
@@ -220,19 +219,16 @@ class ItemCard extends StatelessWidget {
     10. InkWell Memberikan efek ripple saat widget diketuk
     11. MediaQuery Mendapatkan informasi ukuran layar, seperti lebar perangkat agar card lebih responsive terhadap layar
     12. SnackBar Menampilkan notifikasi sementara di bagian bawah layar saat pengguna mengetuk item tertentu
+    13. AppBar Header bagian atas halaman yang berisi judul aplikasi.
+    14. SizedBox Memberikan jarak kosong atau memanipulasi ukuran widget.
+    15. GridView.count Menampilkan widget dalam bentuk grid dengan jumlah kolom tetap.
+    16. Container Widget fleksibel untuk menyimpan elemen dan mengatur ukuran, padding, serta warna latar belakang.
+    17. Material Menambahkan visual material pada widget.
+    18. InfoCard (Widget/Component buatan) Widget kartu khusus untuk menampilkan informasi NPM, nama, dan kelas.
+    19. Center Memposisikan widget anaknya di tengah.
 
 3. Apa fungsi dari setState()? Jelaskan variabel apa saja yang dapat terdampak dengan fungsi tersebut.
     Fungsi setState() pada Flutter memberi tahu framework bahwa ada perubahan pada state widget tertentu, sehingga framework akan menggambar ulang komponen yang terpengaruh. Fungsi ini hanya dapat digunakan pada stateful widget, karena stateless widget tidak mendukung perubahan dinamis. Misalnya, jika widget membutuhkan pembaruan elemen seperti detail pengguna yang diinput, seperti nama, npm, atau kelas, setState() tidak diperlukan jika elemen-elemen tersebut dideklarasikan sebagai final, karena variabel final hanya diinisialisasi sekali dan tidak berubah sepanjang waktu.
 
 4. Jelaskan perbedaan antara const dengan final.
-
-
-
-2.Apa fungsi dari setState()? Jelaskan variabel apa saja yang dapat terdampak dengan fungsi tersebut.
-
-Jawab:
-
-Fungsi setState() pada Flutter digunakan untuk memberi tahu framework bahwa ada perubahan pada state sebuah widget. Saat setState() dipanggil, Flutter akan merender ulang bagian widget yang terdampak agar tampilan menyesuaikan dengan perubahan data. Fungsi setState() hanya bekerja pada Stateful Widget. Pada code, dapat dilihat bahwa tidak terdapat fungsi setState() karena setiap widget yang digunakan merupakan Stateless Widget. Dan semua data, seperti nama, npm, dan kelas dinyatakan dalam tipe variabel final yang diinisialisasi sekali saat pembuatan widget dan tidak berubah sepanjang waktu.
-
-3.Jelaskan perbedaan antara const dengan final.
     Kata kunci final digunakan untuk mendeklarasikan variabel yang hanya dapat diinisialisasi satu kali tetapi nilainya bisa ditentukan saat runtime. Sedangkan const digunakan untuk nilai yang harus ditetapkan pada saat kompilasi, sehingga sifatnya tidak dapat diubah atau "immutable". Setelah ditetapkan, baik variabel final maupun const tidak dapat diubah. Meskipun setiap const otomatis bersifat final, namun tidak semua final memenuhi syarat untuk menjadi konstanta.
