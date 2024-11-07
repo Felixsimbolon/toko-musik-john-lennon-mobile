@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:toko_musik_john_lennon/menu.dart';
+import 'package:toko_musik_john_lennon/screens/menu.dart';
 
 void main() {
   runApp(const MyApp());
