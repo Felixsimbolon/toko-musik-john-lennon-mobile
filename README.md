@@ -232,3 +232,68 @@ class ItemCard extends StatelessWidget {
 
 4. Jelaskan perbedaan antara const dengan final.
     Kata kunci final digunakan untuk mendeklarasikan variabel yang hanya dapat diinisialisasi satu kali tetapi nilainya bisa ditentukan saat runtime. Sedangkan const digunakan untuk nilai yang harus ditetapkan pada saat kompilasi, sehingga sifatnya tidak dapat diubah atau "immutable". Setelah ditetapkan, baik variabel final maupun const tidak dapat diubah. Meskipun setiap const otomatis bersifat final, namun tidak semua final memenuhi syarat untuk menjadi konstanta.
+
+
+# Tugas 8
+
+1. Apa kegunaan const di Flutter? Jelaskan apa keuntungan ketika menggunakan const pada kode Flutter. Kapan sebaiknya kita menggunakan const, dan  
+   kapan sebaiknya tidak digunakan?
+    Penggunaan const di Flutter sangat penting untuk efisiensi performa dan pengelolaan memori. Ketika kita menggunakan const, objek yang dibuat menjadi immutable, artinya objek tersebut tidak bisa diubah setelah dibuat, sehingga sering dipakai untuk widget atau elemen UI yang bersifat statis. Keuntungannya, objek const hanya diciptakan sekali di memori dan bisa digunakan berulang tanpa perlu membuat salinan baru. Ini tentu menghemat penggunaan memori dan mempercepat rendering UI karena widget yang diberi label const tidak perlu dibangun ulang setiap kali tampilan diperbarui. Di sisi lain, karena const dapat diketahui lebih awal oleh Flutter, proses kompilasi pun bisa lebih optimal, menjadikan aplikasi lebih efisien.
+
+    Namun, const sebaiknya hanya digunakan pada elemen-elemen yang sifatnya tidak berubah, seperti teks, ikon, atau pengaturan tetap (misalnya warna dan ukuran). Di sisi lain, const kurang tepat jika digunakan pada objek yang bergantung pada input dinamis pengguna atau kondisi aplikasi. Contohnya, data yang diambil dari API atau variabel yang bisa berubah-ubah tergantung interaksi pengguna tidak bisa diberi label const.
+
+2. Jelaskan dan bandingkan penggunaan Column dan Row pada Flutter. Berikan contoh implementasi dari masing-masing layout widget ini!
+    Column adalah widget yang menyusun elemen-elemen anaknya secara vertikal, dari atas ke bawah. Gunakan Column jika kamu ingin menata beberapa elemen secara bertingkat ke bawah. Sebaliknya, Row menyusun elemen-elemen anaknya secara horizontal, dari kiri ke kanan. Row cocok dipakai saat kamu ingin elemen-elemen tampil sejajar dalam satu baris. Kedua widget ini sangat berguna untuk mengatur tata letak elemen-elemen di layar sesuai dengan kebutuhan desain.
+    contoh implementasi row:
+    ```dart
+    Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            InfoCard(title: 'NPM', content: npm),
+            InfoCard(title: 'Name', content: name),
+            InfoCard(title: 'Class', content: className),
+          ],
+        ),
+    ```
+    hasil implementasi row:
+    ![](static/images/row.png)
+    contoh implementasi column:
+    ```dart
+    Column(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8.0),
+        Text(content),
+      ],
+    ),
+    ```
+    hasil implementasi row:
+    ![](static/images/column.png)    
+3. Sebutkan apa saja elemen input yang kamu gunakan pada halaman form yang kamu buat pada tugas kali ini. Apakah terdapat elemen input Flutter lain 
+   yang tidak kamu gunakan pada tugas ini? Jelaskan!
+   Pada form yang saya buat, ada tiga elemen input utama:
+
+    -Item: Menggunakan TextFormField untuk input teks yang mewakili nama produk
+    -Picture link: Menggunakan TextFormField untuk input teks yang mewakili foto produk yang diambil dari link
+    -harga: Menggunakan TextFormField  dengan validasi agar hanya angka yang diterima.
+    -Description: Menggunakan TextFormField untuk deskripsi produk
+     Ada beberapa elemen input lain yang seharusnya bisa digunakan namun tidak saya pilih untuk tugas ini, seperti:
+
+    1. Checkbox: Untuk memilih opsi atau persetujuan.
+    2. Radio: Untuk pilihan tunggal dalam satu grup.
+    3. Switch: Untuk mengaktifkan atau menonaktifkan pengaturan.
+    4. DropdownButton: Untuk memilih dari daftar pilihan.
+    5. Slider: Untuk memilih nilai dalam rentang tertentu.
+    6. DatePicker: Untuk memilih tanggal.
+
+
+4. Bagaimana cara kamu mengatur tema (theme) dalam aplikasi Flutter agar aplikasi yang dibuat konsisten? Apakah kamu mengimplementasikan tema pada 
+   aplikasi yang kamu buat?
+    Ya, saya telah mengimplementasikan tema di aplikasi yang saya buat. Tema diatur menggunakan ThemeData dalam properti theme pada MaterialApp di file main.dart. Warna utama dan sekunder diatur melalui ColorScheme. Misalnya, saya menetapkan primarySwatch ke Colors.yellow dan warna sekunder ke warna kuning yang lebih terang untuk menciptakan konsistensi visual di seluruh aplikasi.
+
+5. Bagaimana cara kamu menangani navigasi dalam aplikasi dengan banyak halaman pada Flutter?
+    Dalam aplikasi ini, saya menggunakan metode Navigator.push dan Navigator.pop untuk navigasi antar halaman. Navigator.push menambahkan halaman baru ke dalam stack navigasi, sehingga halaman tersebut menjadi halaman aktif di atas halaman sebelumnya. Pengguna masih bisa kembali ke halaman sebelumnya menggunakan Navigator.pop, yang menghapus halaman aktif dari stack dan membawa pengguna kembali ke halaman sebelumnya. Untuk mempermudah navigasi, saya juga menambahkan sebuah drawer di aplikasi.
+
