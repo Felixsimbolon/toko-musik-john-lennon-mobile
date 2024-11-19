@@ -297,3 +297,439 @@ class ItemCard extends StatelessWidget {
 5. Bagaimana cara kamu menangani navigasi dalam aplikasi dengan banyak halaman pada Flutter?
     Dalam aplikasi ini, saya menggunakan metode Navigator.push dan Navigator.pop untuk navigasi antar halaman. Navigator.push menambahkan halaman baru ke dalam stack navigasi, sehingga halaman tersebut menjadi halaman aktif di atas halaman sebelumnya. Pengguna masih bisa kembali ke halaman sebelumnya menggunakan Navigator.pop, yang menghapus halaman aktif dari stack dan membawa pengguna kembali ke halaman sebelumnya. Untuk mempermudah navigasi, saya juga menambahkan sebuah drawer di aplikasi.
 
+
+# Tugas 9
+
+# Penjelasan Kode
+1. Register
+    1. Input Data Akun: Pengguna memasukkan data akun seperti username dan password melalui form register di aplikasi Flutter.
+    2. Pengiriman Data ke Server: Data yang dimasukkan dikirim ke server Django menggunakan permintaan HTTP POST. Contoh pengiriman data:
+    ```dart
+    final response = await request.postJson(
+                        "http://127.0.0.1:8000/auth/register/",
+                        jsonEncode({
+                        "username": username,
+                        "password1": password1,
+                        "password2": password2,
+                        }));
+    ```
+    3. Pemrosesan di Server: Server Django memproses data yang diterima, memvalidasi, dan menyimpan data akun baru ke database. Jika berhasil, server mengirimkan respons sukses.
+    4. Tampilan di Flutter: Aplikasi Flutter menerima respons dari server dan menampilkan pesan sukses atau gagal. Jika sukses, pengguna diarahkan ke halaman login.
+2. Login
+    1. Input Data Akun: Pengguna memasukkan username dan password melalui form login di aplikasi Flutter.
+    2. Pengiriman Data ke Server: Data login dikirim ke server Django menggunakan permintaan HTTP POST. Contoh pengiriman data:
+    ```dart
+  
+    final response = await request
+        .login("http://127.0.0.1:8000/auth/login/", {
+    'username': username,
+    'password': password,
+    });
+    ```
+    3. Pemrosesan di Server: Server Django memverifikasi kredensial yang diterima. Jika valid, server mengirimkan cookie sesi yang menandakan bahwa pengguna telah berhasil login.
+    4. Tampilan di Flutter: Aplikasi Flutter menerima cookie sesi dan menyimpannya. Pengguna diarahkan ke halaman utama (menu) dan pesan selamat datang ditampilkan.
+3. Logout
+    1. Permintaan Logout: Pengguna menekan tombol logout di aplikasi Flutter.
+    2. Pengiriman Permintaan ke Server: Aplikasi Flutter mengirim permintaan logout ke server Django menggunakan permintaan HTTP POST. Contoh pengiriman data:
+    ```dart
+    final response = await request.logout(
+            "http://127.0.0.1:8000/auth/logout/");
+    ```
+4. Implementasi Checklist
+    1. Selanjutnya, saya membuat sebuah file baru bernama register.dart di direktori toko_musik_john_lennon/lib/screens untuk halaman registrasi akun.
+    2. Pada file register.dart, saya membuat halaman registrasi dengan form untuk username, password, dan konfirmasi password, serta tombol untuk mengirim data ke server Django.
+```dart
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:toko_musik_john_lennon/screens/login.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Register'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Card(
+            elevation: 8,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const Text(
+                    'Register',
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 30.0),
+                  TextFormField(
+                    controller: _usernameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Username',
+                      hintText: 'Enter your username',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                      ),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your username';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 12.0),
+                  TextFormField(
+                    controller: _passwordController,
+                    decoration: const InputDecoration(
+                      labelText: 'Password',
+                      hintText: 'Enter your password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                      ),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                    ),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 12.0),
+                  TextFormField(
+                    controller: _confirmPasswordController,
+                    decoration: const InputDecoration(
+                      labelText: 'Confirm Password',
+                      hintText: 'Confirm your password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                      ),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                    ),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please confirm your password';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24.0),
+                  ElevatedButton(
+                    onPressed: () async {
+                      String username = _usernameController.text;
+                      String password1 = _passwordController.text;
+                      String password2 = _confirmPasswordController.text;
+
+                      // Cek kredensial
+                      // TODO: Ganti URL dan jangan lupa tambahkan trailing slash (/) di akhir URL!
+                      // Untuk menyambungkan Android emulator dengan Django pada localhost,
+                      // gunakan URL http://10.0.2.2/
+                      final response = await request.postJson(
+                          "http://127.0.0.1:8000/auth/register/",
+                          jsonEncode({
+                            "username": username,
+                            "password1": password1,
+                            "password2": password2,
+                          }));
+                      if (context.mounted) {
+                        if (response['status'] == 'success') {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Successfully registered!'),
+                            ),
+                          );
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginPage()),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Failed to register!'),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      minimumSize: Size(double.infinity, 50),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    ),
+                    child: const Text('Register'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+3. Saya mengintegrasikan sistem autentikasi Django dengan proyek Flutter menggunakan package pbp_django_auth dan provider.
+4. Saya membuat halaman login pada proyek tugas Flutter di file login.dart di direktori toko_musik_john_lennon/lib/screens.
+5. Saya membuat model kustom sesuai dengan proyek aplikasi Django di file product_entry.dart di direktori toko_musik_john_lennon/lib/models.
+```dart
+import 'dart:convert';
+
+List<Product> productFromJson(String str) =>
+    List<Product>.from(json.decode(str).map((x) => Product.fromJson(x)));
+
+String productToJson(List<Product> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
+class Product {
+  String model;
+  String pk;
+  Fields fields;
+
+  Product({
+    required this.model,
+    required this.pk,
+    required this.fields,
+  });
+
+  factory Product.fromJson(Map<String, dynamic> json) => Product(
+        model: json["model"],
+        pk: json["pk"],
+        fields: Fields.fromJson(json["fields"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "model": model,
+        "pk": pk,
+        "fields": fields.toJson(),
+      };
+}
+
+class Fields {
+  String item;
+  String pictureLink;
+  String description;
+  int price;
+
+  Fields({
+    required this.item,
+    required this.pictureLink,
+    required this.description,
+    required this.price,
+  });
+
+  factory Fields.fromJson(Map<String, dynamic> json) => Fields(
+        item: json["item"],
+        pictureLink: json["picture_link"],
+        description: json["description"],
+        price: json["price"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "item": item,
+        "picture_link": pictureLink,
+        "description": description,
+        "price": price,
+      };
+}
+
+
+```
+6. Saya membuat halaman yang berisi daftar semua item yang terdapat pada endpoint JSON di Django yang telah saya deploy di file list_productentry.dart di direktori toko_musik_john_lennon/lib/screens.
+7. Saya membuat halaman detail untuk setiap item yang terdapat pada halaman daftar item di file productdetail.dart di direktori toko_musik_john_lennon/lib/screens.
+8. Saya melakukan filter pada halaman daftar item dengan hanya menampilkan item yang terasosiasi dengan pengguna yang login di file list_productentry.dart.
+```dart
+import 'package:flutter/material.dart';
+import 'package:toko_musik_john_lennon/models/product_entry.dart';
+import 'package:toko_musik_john_lennon/screens/productdetail.dart';
+import 'package:toko_musik_john_lennon/widgets/left_drawer.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+
+class ProductEntryPage extends StatefulWidget {
+  const ProductEntryPage({super.key});
+
+  @override
+  State<ProductEntryPage> createState() => _ProductEntryPageState();
+}
+
+class _ProductEntryPageState extends State<ProductEntryPage> {
+  Future<List<Product>> fetchProducts(CookieRequest request) async {
+    // Replace with the correct API URL
+    final response = await request.get('http://127.0.0.1:8000/json/');
+
+    // Decode the response and convert to a list of Product objects
+    List<Product> productList = [];
+    for (var d in response) {
+      if (d != null) {
+        productList.add(Product.fromJson(d));
+      }
+    }
+    return productList;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Product Entry List'),
+      ),
+      drawer: const LeftDrawer(),
+      body: FutureBuilder(
+        future: fetchProducts(request),
+        builder: (context, AsyncSnapshot snapshot) {
+          if (snapshot.data == null) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            if (!snapshot.hasData || snapshot.data.isEmpty) {
+              return const Center(
+                child: Text(
+                  'Belum ada data produk pada Toko Musik John Lennon.',
+                  style: TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
+                ),
+              );
+            } else {
+              return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (_, index) {
+                  final product = snapshot.data[index];
+                  return Card(
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: InkWell(
+                      splashColor: Colors.blue.withAlpha(30),
+                      onTap: () {
+                        // Navigate to ProductDetailPage and pass the selected product
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ProductDetailPage(product: product),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(20.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Display the item name
+                            Text(
+                              product.fields.item,
+                              style: const TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            // Display the product image
+                            product.fields.pictureLink.isNotEmpty
+                                ? Image.network(
+                                    product.fields.pictureLink,
+                                    height: 150,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  )
+                                : const Text(
+                                    'No Image Available',
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                            const SizedBox(height: 10),
+                            // Display other product details
+                            Text('Price: \$${product.fields.price}'),
+                            const SizedBox(height: 5),
+                            Text('Description: ${product.fields.description}'),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+          }
+        },
+      ),
+    );
+  }
+}
+
+```
+
+# Pertanyaan
+1. Mengapa Perlu Membuat Model untuk Pengambilan atau Pengiriman Data JSON? Apakah Tanpa Model Akan Terjadi Error?
+    Model sangat penting dalam proses pengambilan dan pengiriman data JSON karena model berfungsi sebagai cetak biru yang menentukan bagaimana data JSON dipetakan ke objek dalam aplikasi. Dengan model, kita dapat mengubah data JSON dari API menjadi objek yang lebih mudah digunakan di dalam kode Dart, serta memastikan bahwa data yang dikirimkan ke API memiliki format yang sesuai. Model juga mempermudah validasi data dan memperjelas struktur data, sehingga memudahkan proses debugging.
+2. Fungsi Library http dalam Tugas
+    Library http dalam Dart digunakan untuk mengelola permintaan HTTP, seperti mengirim data ke server atau mengambil respons dari server. Dalam tugas ini, library ini memungkinkan aplikasi Flutter berkomunikasi dengan backend Django yang berjalan di localhost. Operasi seperti GET, POST, PUT, dan DELETE dapat dilakukan dengan mudah menggunakan library ini.
+
+    Melalui library http, aplikasi Flutter dapat mengirim data dalam format JSON dan menerima respons dari server dalam format serupa. Ini penting untuk fitur seperti login, pendaftaran, pengambilan data menu, dan penambahan data baru. Dengan mekanisme yang efisien, library ini mendukung pengembangan aplikasi yang membutuhkan integrasi server secara efektif.
+3. Fungsi dan Pentingnya Instance CookieRequest
+    CookieRequest adalah kelas yang menangani permintaan HTTP yang memerlukan autentikasi berbasis cookie. Kelas ini menyederhanakan pengelolaan sesi pengguna dengan mengirimkan cookie saat melakukan permintaan ke server. Fungsinya meliputi login, logout, dan pengelolaan data dengan autentikasi cookie.
+
+    Instance CookieRequest harus dibagikan ke seluruh komponen aplikasi Flutter untuk memastikan semua komponen dapat mengakses data sesi pengguna. Dengan menggunakan metode seperti Provider, instance ini dapat digunakan oleh berbagai bagian aplikasi untuk mengelola operasi autentikasi dan menjaga konsistensi sesi. Hal ini penting agar setiap permintaan yang membutuhkan autentikasi dapat dilakukan secara aman dan konsisten.
+
+    1. Mekanisme Pengiriman Data dalam Aplikasi Flutter
+
+    Input Data dari Pengguna
+    Pengguna memasukkan data melalui form di aplikasi Flutter. Setelah data divalidasi, aplikasi mempersiapkan data untuk dikirim ke server. Sebagai contoh, pengguna mengisi form untuk menambahkan menu baru dengan informasi seperti gambar, nama, harga, dan deskripsi.
+
+    2. Pengiriman Data ke Server
+    Data yang telah divalidasi dikirim ke server menggunakan library seperti http atau pbp_django_auth melalui permintaan POST. Format data yang dikirim biasanya adalah JSON.
+
+    3. Pemrosesan Data di Server
+    Server menerima data tersebut, memprosesnya sesuai logika bisnis, dan menyimpannya ke dalam database. Server kemudian mengirimkan respons kembali ke aplikasi, biasanya dalam format JSON yang berisi status dan informasi tambahan.
+
+    4. Menampilkan Data di Flutter
+    Respons dari server diproses di aplikasi Flutter. Data yang diperbarui dapat ditampilkan di UI, misalnya sebagai daftar menu atau grid. Data baru dapat diambil kembali dari server menggunakan permintaan GET untuk memastikan sinkronisasi dengan database.
+
+    Dengan alur ini, data dari pengguna dapat diterima, diproses, dan ditampilkan kembali di aplikasi secara terintegrasi dan efisien.
