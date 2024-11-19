@@ -1,32 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:toko_musik_john_lennon/models/product_entry.dart';
+import 'package:toko_musik_john_lennon/screens/productdetail.dart';
 import 'package:toko_musik_john_lennon/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
-class ProductEntry extends StatefulWidget {
-  const ProductEntry({super.key});
+class ProductEntryPage extends StatefulWidget {
+  const ProductEntryPage({super.key});
 
   @override
-  State<ProductEntry> createState() => _ProductEntryState();
+  State<ProductEntryPage> createState() => _ProductEntryPageState();
 }
 
-class _ProductEntryState extends State<ProductEntry> {
-  Future<List<Product>> fetchMood(CookieRequest request) async {
-    // TODO: Ganti URL dan jangan lupa tambahkan trailing slash (/) di akhir URL!
+class _ProductEntryPageState extends State<ProductEntryPage> {
+  Future<List<Product>> fetchProducts(CookieRequest request) async {
+    // Replace with the correct API URL
     final response = await request.get('http://127.0.0.1:8000/json/');
 
-    // Melakukan decode response menjadi bentuk json
-    var data = response;
-
-    // Melakukan konversi data json menjadi object Product
-    List<Product> listMood = [];
-    for (var d in data) {
+    // Decode the response and convert to a list of Product objects
+    List<Product> productList = [];
+    for (var d in response) {
       if (d != null) {
-        listMood.add(Product.fromJson(d));
+        productList.add(Product.fromJson(d));
       }
     }
-      return listMood;
+    return productList;
   }
 
   @override
@@ -38,48 +36,87 @@ class _ProductEntryState extends State<ProductEntry> {
       ),
       drawer: const LeftDrawer(),
       body: FutureBuilder(
-        future: fetchMood(request),
+        future: fetchProducts(request),
         builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.data == null) {
             return const Center(child: CircularProgressIndicator());
           } else {
-            if (!snapshot.hasData) {
-              return const Column(
-                children: [
-                  Text(
-                    'Belum ada data product pada Toko musik john lennon.',
-                    style: TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
-                  ),
-                  SizedBox(height: 8),
-                ],
+            if (!snapshot.hasData || snapshot.data.isEmpty) {
+              return const Center(
+                child: Text(
+                  'Belum ada data produk pada Toko Musik John Lennon.',
+                  style: TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
+                ),
               );
             } else {
               return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (_, index) => Container(
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "${snapshot.data![index].fields.mood}",
-                        style: const TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
+                itemCount: snapshot.data.length,
+                itemBuilder: (_, index) {
+                  final product = snapshot.data[index];
+                  return Card(
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: InkWell(
+                      splashColor: Colors.blue.withAlpha(30),
+                      onTap: () {
+                        // Navigate to ProductDetailPage and pass the selected product
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ProductDetailPage(product: product),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(20.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Display the item name
+                            Text(
+                              product.fields.item,
+                              style: const TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            // Display the product image
+                            product.fields.pictureLink.isNotEmpty
+                                ? Image.network(
+                                    product.fields.pictureLink,
+                                    height: 150,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  )
+                                : const Text(
+                                    'No Image Available',
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                            const SizedBox(height: 10),
+                            // Display other product details
+                            Text('Price: \$${product.fields.price}'),
+                            const SizedBox(height: 5),
+                            Text('Description: ${product.fields.description}'),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      Text("${snapshot.data![index].fields.feelings}"),
-                      const SizedBox(height: 10),
-                      Text("${snapshot.data![index].fields.moodIntensity}"),
-                      const SizedBox(height: 10),
-                      Text("${snapshot.data![index].fields.time}")
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               );
             }
           }
@@ -88,4 +125,3 @@ class _ProductEntryState extends State<ProductEntry> {
     );
   }
 }
-

@@ -1,4 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:toko_musik_john_lennon/screens/menu.dart';
+import 'package:toko_musik_john_lennon/widgets/left_drawer.dart';
 // TODO: Impor drawer yang sudah dibuat sebelumnya
 
 class ProductEntryFormPage extends StatefulWidget {
@@ -16,6 +22,8 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
   int _price = 0;
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Center(
@@ -27,6 +35,7 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
         foregroundColor: Colors.white,
       ),
       // TODO: Tambahkan drawer yang sudah dibuat di sini
+      drawer: const LeftDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -137,48 +146,40 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
                     backgroundColor: WidgetStateProperty.all(
                         Theme.of(context).colorScheme.primary),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('Produk berhasil tersimpan'),
-                            content: SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _pictureLink.isNotEmpty
-                                        ? Image.network(
-                                            _pictureLink,
-                                            width: 100,
-                                            height: 100,
-                                            errorBuilder: (context, error, stackTrace) {
-                                              return const Text('Failed to load image');
-                                            },
-                                          )
-                                        : const Text('No image available'),
-                                  Text('Item: $_item'),
-                                  Text('Deskripi: $_description' ),
-                                  Text('Harga: $_price'),
-                                  // TODO: Munculkan value-value lainnya
-                                ],
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                child: const Text('OK'),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  _formKey.currentState!.reset();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                        // Send data to Django and wait for a response
+                        final response = await request.postJson(
+                            "http://127.0.0.1:8000/create-product-flutter/",
+                            jsonEncode(<String, String>{
+                                'item': _item,
+                                'picture_link': _pictureLink,
+                                'description': _description,
+                                'price': _price.toString(),
+                            }),
+                        );
+                        if (context.mounted) {
+                            if (response['status'] == 'success') {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Produk baru berhasil disimpan!"),
+                                  ),
+                                );
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => MyHomePage()),
+                                );
+                            } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Terdapat kesalahan, silakan coba lagi."),
+                                  ),
+                                );
+                            }
+                        }
                     }
                   },
+
                   child: const Text(
                     "Save",
                     style: TextStyle(color: Colors.white),

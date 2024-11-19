@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:toko_musik_john_lennon/screens/list_productentry.dart';
 import 'package:toko_musik_john_lennon/screens/menu.dart';
 import 'package:toko_musik_john_lennon/screens/productentry_form.dart';
 
@@ -37,12 +38,10 @@ class LeftDrawer extends StatelessWidget {
                     fontWeight: FontWeight.normal,
                     color: Colors.white,
                   )
-                  // TODO: Tambahkan gaya teks dengan center alignment, font ukuran 15, warna putih, dan weight biasa
                 ),
               ],
             ),
           ),
-            // TODO: Bagian routing
           ListTile(
             leading: const Icon(Icons.home_outlined),
             title: const Text('Halaman Utama'),
@@ -67,6 +66,17 @@ class LeftDrawer extends StatelessWidget {
                   ));
         
             },
+          ),
+          ListTile(
+              leading: const Icon(Icons.add_reaction_rounded),
+              title: const Text('Daftar Produk'),
+              onTap: () {
+                  // Route menu ke halaman mood
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ProductEntryPage()),
+                  );
+              },
           ),
 
         ],
