@@ -718,7 +718,7 @@ class _ProductEntryPageState extends State<ProductEntryPage> {
 
     Instance CookieRequest harus dibagikan ke seluruh komponen aplikasi Flutter untuk memastikan semua komponen dapat mengakses data sesi pengguna. Dengan menggunakan metode seperti Provider, instance ini dapat digunakan oleh berbagai bagian aplikasi untuk mengelola operasi autentikasi dan menjaga konsistensi sesi. Hal ini penting agar setiap permintaan yang membutuhkan autentikasi dapat dilakukan secara aman dan konsisten.
 
-    1. Mekanisme Pengiriman Data dalam Aplikasi Flutter
+4. Mekanisme Pengiriman Data dalam Aplikasi Flutter
 
     Input Data dari Pengguna
     Pengguna memasukkan data melalui form di aplikasi Flutter. Setelah data divalidasi, aplikasi mempersiapkan data untuk dikirim ke server. Sebagai contoh, pengguna mengisi form untuk menambahkan menu baru dengan informasi seperti gambar, nama, harga, dan deskripsi.
